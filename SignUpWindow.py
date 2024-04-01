@@ -61,6 +61,7 @@ def submit_form(email_entry, password_entry, confirm_password_entry):
         create_table(conn)
         insert_user(conn, email, password)
         conn.close()
+        messagebox.showinfo("Success", "User successfully added to the database.")
 
 def main():
     window = tk.Tk()
