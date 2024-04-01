@@ -1,12 +1,14 @@
 import sqlite3
 
-def create_connection(db_file):
-    conn = None
+DATABASE_FILE = "user_database.db"
+
+def create_connection():
     try:
-        conn = sqlite3.connect(db_file)
+        conn = sqlite3.connect(DATABASE_FILE)
+        return conn
     except sqlite3.Error as e:
         print(e)
-    return conn
+        return None
 
 def create_table(conn):
     try:
@@ -14,33 +16,28 @@ def create_table(conn):
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY,
-                username TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL
             )
         ''')
+        print("Table created successfully")
+        conn.commit()
     except sqlite3.Error as e:
         print(e)
 
-def insert_user(conn, username, password):
+def insert_user(conn, email, password):
     try:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        cursor.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, password))
         conn.commit()
+        print("User inserted successfully.")
     except sqlite3.IntegrityError:
-        print("Username already exists. Please choose another username.")
+        print("Email already exists. Please choose another email.")
     except sqlite3.Error as e:
         print(e)
 
-def main():
-    database = "user_database.db"
-    conn = create_connection(database)
-    if conn is not None:
+if __name__ == "__main__":
+    conn = create_connection()
+    if conn:
         create_table(conn)
-        insert_user(conn, "user1", "password1")
-        insert_user(conn, "user2", "password2")
         conn.close()
-    else:
-        print("Error! Cannot create the database connection.")
-
-if __name__ == '__main__':
-    main()
